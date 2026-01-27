@@ -1,6 +1,5 @@
 name: 自动化测试流水线
 
-# 触发条件：当代码推送到 master 或 main 分支时
 on:
   push:
     branches: [ master, main ]
@@ -9,37 +8,31 @@ on:
 
 jobs:
   test-job:
-    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 服务器
+    runs-on: ubuntu-latest
 
     steps:
-    # 1. 拉取你的代码
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4  # 这里改成了 v4
 
-    # 2. 安装 Python 环境
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5 # 这里改成了 v5
       with:
         python-version: '3.10'
 
-    # 3. 安装依赖包 (根据你的清单)
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        # 必须额外运行这行来安装浏览器驱动
         playwright install chromium
 
-    # 4. 运行测试
     - name: Run Pytest
       run: |
-        # 进入你的代码目录并运行
         cd ONE_DAY
+        # 这里的 headless=True 是关键，确保你的代码里不要强制 headless=False
         pytest --html=report.html
 
-    # 5. (可选) 把生成的报告存起来，让你能下载查看
     - name: Upload Test Report
-      if: always() # 无论测试成功失败都上传报告
-      uses: actions/upload-artifact@v3
+      if: always()
+      uses: actions/upload-artifact@v4  # 这里改成了 v4 (修复报错的核心)
       with:
         name: test-report
         path: ONE_DAY/report.html
